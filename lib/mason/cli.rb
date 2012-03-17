@@ -6,7 +6,7 @@ require "thor/shell/basic"
 
 class Mason::CLI < Thor
 
-  class_option :help, :aliases => "-h", :desc => "help for this command"
+  class_option :help, :type => :boolean, :aliases => "-h", :desc => "help for this command"
 
   map %w( -v -V --version ) => :version
 
