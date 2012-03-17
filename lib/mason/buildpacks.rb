@@ -1,15 +1,17 @@
 require "fileutils"
 require "mason"
+require "uri"
 
 class Mason::Buildpacks
 
   def self.install(url)
     FileUtils.mkdir_p buildpacks_root
     Dir.chdir(buildpacks_root) do
-      if url =~ /buildpack-(\w+)/
+      if URI.parse(url).path =~ /buildpack-(\w+)/
         name = $1
         raise "#{name} buildpack already installed" if File.exists?(name)
         system "git clone #{url} #{name} >/dev/null 2>&1"
+        raise "failed to clone buildpack" unless $?.exitstatus.zero?
       else
         raise "BUILDPACK should be a url containing buildpack-NAME.git"
       end
