@@ -10,8 +10,8 @@ Build things
 	* buildpacks (~/.mason/buildpacks)
 	  = foo: https://github.com/ddollar/buildpack-foo.git
 	  = bar: https://github.com/ddollar/buildpack-bar.git
-	
-	$ mason buildpacks:add https://github.com/ddollar/buildpack-baz.git
+
+	$ mason buildpacks:install https://github.com/ddollar/buildpack-baz.git
 	* adding buildpack https://github.com/ddollar/buildpack-baz.git
 
 ### Use buildpacks to build things
@@ -25,7 +25,7 @@ Build things
 	* packaging... done
 	  = type: squashfs
 	  = file: /tmp/app.img
-	
+
 	$ mason build /tmp/app -t dir -o /tmp/compiledapp
 	* detecting buildpack... done
 	  = name: Baz
@@ -35,7 +35,7 @@ Build things
 	* packaging... done
 	  = type: dir
 	  = dir: /tmp/compiledapp
-	
+
 	$ mason build /tmp/app -b https://github.com/ddollar/buildpack-other.git -t tgz
 	* detecting buildpack... done
 	  = name: Other
