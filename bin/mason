@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+$:.unshift File.expand_path("../../lib", __FILE__)
+
+require "mason/cli"
+
+begin
+  Mason::CLI.run
+rescue Errno::EPIPE
+rescue Mason::CommandFailed => ex
+  $stderr.puts "ERROR: #{ex}"
+  exit 1
+end
