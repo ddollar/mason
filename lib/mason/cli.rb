@@ -1,6 +1,6 @@
 require "clamp"
 require "mason"
-require "mason/buildpack"
+require "mason/buildpacks"
 require "mason/version"
 
 class Mason::CLI < Clamp::Command
@@ -13,7 +13,14 @@ class Mason::CLI < Clamp::Command
   subcommand "buildpacks", "list installed buildpacks" do
 
     def execute
-      Mason::Buildpack.list
+      buildpacks = Mason::Buildpacks.buildpacks
+
+      puts "* buildpacks (#{Mason::Buildpacks.root})"
+      buildpacks.keys.sort.each do |name|
+        puts "  = #{name}: #{buildpacks[name]}"
+      end
+
+      puts "  - no buildpacks installed, use buildpacks:add" if buildpacks.length.zero?
     rescue StandardError => ex
       raise Mason::CommandFailed, ex.message
     end
@@ -25,7 +32,8 @@ class Mason::CLI < Clamp::Command
     parameter "URL", "buildpack url to install"
 
     def execute
-      Mason::Buildpack.install url
+      puts "* adding buildpack #{url}"
+      Mason::Buildpacks.install url
     rescue StandardError => ex
       raise Mason::CommandFailed, ex.message
     end
@@ -37,7 +45,8 @@ class Mason::CLI < Clamp::Command
     parameter "BUILDPACK", "buildpack name to uninstall"
 
     def execute
-      Mason::Buildpack.uninstall buildpack
+      puts "* removing buildpack #{buildpack}"
+      Mason::Buildpacks.uninstall buildpack
     rescue StandardError => ex
       raise Mason::CommandFailed, ex.message
     end

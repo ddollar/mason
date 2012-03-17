@@ -8,6 +8,6 @@ begin
   Mason::CLI.run
 rescue Errno::EPIPE
 rescue Mason::CommandFailed => ex
-  $stderr.puts "ERROR: #{ex}"
+  $stderr.puts "  ! #{ex}"
   exit 1
 end

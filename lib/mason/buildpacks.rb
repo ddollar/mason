@@ -1,15 +1,7 @@
 require "fileutils"
 require "mason"
 
-class Mason::Buildpack
-
-  def self.list
-    puts "* buildpacks (#{buildpacks_pretty_root})"
-    buildpacks.keys.sort.each do |name|
-      puts "  = #{name}: #{buildpacks[name]}"
-    end
-    puts "  - no buildpacks installed, use buildpacks:add" if buildpacks.length.zero?
-  end
+class Mason::Buildpacks
 
   def self.install(url)
     FileUtils.mkdir_p buildpacks_root
@@ -17,7 +9,7 @@ class Mason::Buildpack
       if url =~ /buildpack-(\w+)/
         name = $1
         raise "#{name} buildpack already installed" if File.exists?(name)
-        system "git clone #{url} #{name}"
+        system "git clone #{url} #{name} >/dev/null 2>&1"
       else
         raise "BUILDPACK should be a url containing buildpack-NAME.git"
       end
@@ -31,7 +23,9 @@ class Mason::Buildpack
     end
   end
 
-private
+  def self.root
+    "~/.mason/buildpacks"
+  end
 
   def self.buildpacks
     @buildpacks ||= begin
@@ -45,12 +39,10 @@ private
     end
   end
 
-  def self.buildpacks_pretty_root
-    "~/.mason/buildpacks"
-  end
+private
 
   def self.buildpacks_root
-    File.expand_path(buildpacks_pretty_root)
+    File.expand_path(root)
   end
 
 end
