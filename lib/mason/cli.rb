@@ -1,56 +1,85 @@
-require "clamp"
 require "mason"
 require "mason/buildpacks"
 require "mason/version"
+require "thor"
+require "thor/shell/basic"
 
-class Mason::CLI < Clamp::Command
+class Mason::CLI < Thor
 
-  option %w( -v --version ), :flag, "show version and exit" do
+  class_option :help, :aliases => "-h", :desc => "help for this command"
+
+  map %w( -v -V --version ) => :version
+
+  desc "version", "display version"
+
+  def version
     puts "mason v#{Mason::VERSION}"
-    exit 0
   end
 
-  subcommand "buildpacks", "list installed buildpacks" do
+  desc "build APP", "build an app"
 
-    def execute
-      buildpacks = Mason::Buildpacks.buildpacks
+  method_option :output, :type => :string, :aliases => "-o", :desc => "output location"
 
-      puts "* buildpacks (#{Mason::Buildpacks.root})"
-      buildpacks.keys.sort.each do |name|
-        puts "  = #{name}: #{buildpacks[name]}"
-      end
+  def build(app)
+  end
 
-      puts "  - no buildpacks installed, use buildpacks:add" if buildpacks.length.zero?
-    rescue StandardError => ex
-      raise Mason::CommandFailed, ex.message
+  desc "buildpacks", "list installed buildpacks"
+
+  def buildpacks
+    buildpacks = Mason::Buildpacks.buildpacks
+
+    puts "* buildpacks (#{Mason::Buildpacks.root})"
+    buildpacks.keys.sort.each do |name|
+      puts "  = #{name}: #{buildpacks[name]}"
     end
 
+    puts "  - no buildpacks installed, use buildpacks:add" if buildpacks.length.zero?
+  rescue StandardError => ex
+    raise Mason::CommandFailed, ex.message
   end
 
-  subcommand "buildpacks:add", "install a buildpack" do
+  class Buildpacks < Thor
 
-    parameter "URL", "buildpack url to install"
+    desc "buildpacks:install URL", "install a buildpack"
 
-    def execute
+    def install(url)
       puts "* adding buildpack #{url}"
       Mason::Buildpacks.install url
     rescue StandardError => ex
       raise Mason::CommandFailed, ex.message
     end
 
-  end
+    desc "buildpacks:uninstall NAME", "uninstall a buildpack"
 
-  subcommand "buildpacks:remove", "uninstall a buildpack" do
-
-    parameter "BUILDPACK", "buildpack name to uninstall"
-
-    def execute
-      puts "* removing buildpack #{buildpack}"
-      Mason::Buildpacks.uninstall buildpack
+    def uninstall(name)
+      puts "* removing buildpack #{name}"
+      Mason::Buildpacks.uninstall name
     rescue StandardError => ex
       raise Mason::CommandFailed, ex.message
     end
 
+  end
+
+  # hack thor
+  def self.run
+    args   = ARGV.dup
+    parts  = args.first.to_s.split(":")
+    method = parts.pop
+    ns     = parts.pop
+
+    args[0] = method
+
+    klass = case ns
+      when "buildpacks" then Buildpacks
+      else self
+    end
+
+    unless (args & %w( -h --help )).empty?
+      klass.task_help(Thor::Shell::Basic.new, args.first)
+      return
+    end
+
+    klass.start(args)
   end
 
 end
