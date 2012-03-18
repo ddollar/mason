@@ -31,15 +31,15 @@ class Mason::Buildpack
       FileUtils.cp_r app, compile_dir
       Dir.chdir(compile_dir) do
         Bundler.with_clean_env do
-          # IO.popen(%{ #{script("compile")} "#{compile_dir}" "#{cache_dir}" }) do |io|
-          #   until io.eof?
-          #     data = io.gets
-          #     data.gsub!(/^-----> /, "  + ")
-          #     data.gsub!(/^       /, "      ")
-          #     data.gsub!(/^\s+$/, "")
-          #     print data
-          #   end
-          # end
+          IO.popen(%{ #{script("compile")} "#{compile_dir}" "#{cache_dir}" }) do |io|
+            until io.eof?
+              data = io.gets
+              data.gsub!(/^-----> /, "  + ")
+              data.gsub!(/^       /, "      ")
+              data.gsub!(/^\s+$/, "")
+              print data
+            end
+          end
         end
       end
       compile_dir
