@@ -1,0 +1,5 @@
+Vagrant::Config.run do |config|
+  config.vagrant.dotfile_name = File.expand_path("~/.mason/vagrant")
+
+BOXES
+end
