@@ -1,12 +1,14 @@
 require "fileutils"
 require "mason"
+require "mason/buildpack"
 require "uri"
 
 class Mason::Buildpacks
 
   def self.install(url)
-    FileUtils.mkdir_p buildpacks_root
-    Dir.chdir(buildpacks_root) do
+    FileUtils.mkdir_p root
+
+    Dir.chdir(root) do
       if URI.parse(url).path =~ /buildpack-(\w+)/
         name = $1
         raise "#{name} buildpack already installed" if File.exists?(name)
@@ -19,32 +21,31 @@ class Mason::Buildpacks
   end
 
   def self.uninstall(name)
-    Dir.chdir(buildpacks_root) do
+    Dir.chdir(root) do
       raise "#{name} buildpack is not installed" unless File.exists?(name)
       FileUtils.rm_rf name
     end
   end
 
-  def self.root
-    "~/.mason/buildpacks"
+  def self.root(expand=true)
+    dir = "~/.mason/buildpacks"
+    expand ? File.expand_path(dir) : dir
   end
 
   def self.buildpacks
     @buildpacks ||= begin
-      Dir[File.join(buildpacks_root, "*")].inject({}) do |hash, buildpack|
-        Dir.chdir(buildpack) do
-          name = File.basename(buildpack)
-          url  = %x{ git config remote.origin.url }.chomp
-          hash.update(name => url)
-        end
+      Dir[File.join(root, "*")].map do |buildpack_dir|
+        Mason::Buildpack.new(buildpack_dir)
       end
     end
   end
 
-private
-
-  def self.buildpacks_root
-    File.expand_path(root)
+  def self.detect(app)
+    buildpacks.each do |buildpack|
+      ret = buildpack.detect(app)
+      return [buildpack, ret] if ret
+    end
+    nil
   end
 
 end

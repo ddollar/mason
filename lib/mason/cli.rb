@@ -18,9 +18,52 @@ class Mason::CLI < Thor
 
   desc "build APP", "build an app"
 
-  method_option :output, :type => :string, :aliases => "-o", :desc => "output location"
+  method_option :buildpack, :type => :string, :aliases => "-b", :desc => "use a custom buildpack"
+  method_option :output,    :type => :string, :aliases => "-o", :desc => "output location"
+  method_option :type,      :type => :string, :aliases => "-t", :desc => "output type (dir, img, tgz)"
 
   def build(app)
+    raise "no such directory: #{app}" unless File.exists?(app)
+
+    type = options[:type]
+    output = options[:output]
+
+    type = File.extname(output)[1..-1] if !type && output
+    output = "#{app}.#{type}" if !output && type
+    type ||= "dir"
+
+    raise "no such output format: #{type}" unless %w( dir img tgz ).include?(type)
+
+    print "* detecting buildpack... "
+
+    buildpack, ret = Mason::Buildpacks.detect(app)
+    raise "no valid buildpack detected" unless buildpack
+
+    puts "done"
+    puts "  = name: #{buildpack.name}"
+    puts "  = url: #{buildpack.url}"
+    puts "  = display: #{ret}"
+
+    puts "* compiling..."
+    compile_dir = buildpack.compile(app)
+
+    print "* packaging... "
+    case type.to_sym
+    when :tgz then
+      Dir.chdir(compile_dir) do
+        system %{ tar czf "#{output}" . }
+      end
+    when :img then
+      puts "not yet"
+    when :dir then
+      FileUtils.rm_rf output
+      FileUtils.cp_r compile_dir, output
+    else
+      raise "no such output type: #{type}"
+    end
+    puts "done"
+    puts "  = type: #{type}"
+    puts "  = location: #{output}"
   end
 
   desc "buildpacks", "list installed buildpacks"
@@ -28,14 +71,12 @@ class Mason::CLI < Thor
   def buildpacks
     buildpacks = Mason::Buildpacks.buildpacks
 
-    puts "* buildpacks (#{Mason::Buildpacks.root})"
-    buildpacks.keys.sort.each do |name|
-      puts "  = #{name}: #{buildpacks[name]}"
+    puts "* buildpacks (#{Mason::Buildpacks.root(false)})"
+    buildpacks.sort.each do |buildpack|
+      puts "  = #{buildpack.name}: #{buildpack.url}"
     end
 
     puts "  - no buildpacks installed, use buildpacks:add" if buildpacks.length.zero?
-  rescue StandardError => ex
-    raise Mason::CommandFailed, ex.message
   end
 
   class Buildpacks < Thor
@@ -45,8 +86,6 @@ class Mason::CLI < Thor
     def install(url)
       puts "* adding buildpack #{url}"
       Mason::Buildpacks.install url
-    rescue StandardError => ex
-      raise Mason::CommandFailed, ex.message
     end
 
     desc "buildpacks:uninstall NAME", "uninstall a buildpack"
@@ -54,8 +93,6 @@ class Mason::CLI < Thor
     def uninstall(name)
       puts "* removing buildpack #{name}"
       Mason::Buildpacks.uninstall name
-    rescue StandardError => ex
-      raise Mason::CommandFailed, ex.message
     end
 
   end
@@ -80,6 +117,8 @@ class Mason::CLI < Thor
     end
 
     klass.start(args)
+  # rescue StandardError => ex
+  #   raise Mason::CommandFailed, ex.message
   end
 
 end
