@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    mason (0.0.3)
+    mason (0.0.4)
       thor
 
 GEM
