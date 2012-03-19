@@ -2,4 +2,4 @@ source :rubygems
 
 gemspec
 
-gem "thor"
+gem "vagrant"

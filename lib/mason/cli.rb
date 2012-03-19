@@ -151,11 +151,14 @@ class Mason::CLI < Thor
   desc "stacks", "list available stacks"
 
   def stacks
+    stacks = Mason::Stacks.stacks
+
     puts "* available stacks"
-    Mason::Stacks.vms.each do |name, vm|
-      next if name == :default
+    stacks.keys.each do |name|
       puts "  - #{name} [#{Mason::Stacks.state(name)}]"
     end
+
+    puts "  - no stacks created, use stacks:create" if stacks.length.zero?
   end
 
   class Stacks < Thor
