@@ -60,7 +60,7 @@ You will need [VirtualBox](https://www.virtualbox.org/wiki/Downloads) for Vagran
     $ mason stacks:up VAGRANT_BOX_NAME
     * booting stack cedar (this may take a while)... done
     
-    $ mason:build /tmp/app -t tgz -o /tmp/compiled.tgz
+    $ mason:build /tmp/app -t tgz -o /tmp/compiled.tgz -s cedar
     * booting stack cedar (this may take a while)... done    
 	* detecting buildpack... done
 	  = name: Baz
