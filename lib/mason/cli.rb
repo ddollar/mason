@@ -7,6 +7,7 @@ require "thor/shell/basic"
 
 class Mason::CLI < Thor
 
+  class_option :debug, :type => :boolean, :desc => "show backtraces"
   class_option :help, :type => :boolean, :aliases => "-h", :desc => "help for this command"
 
   map %w( -v -V --version ) => :version
@@ -236,7 +237,9 @@ class Mason::CLI < Thor
 
     klass.start(args)
   rescue StandardError => ex
-    raise Mason::CommandFailed, ex.message
+    $stderr.puts "  ! #{ex}"
+    $stderr.puts "  " + ex.backtrace.join("\n  ") if ARGV.include?("--debug")
+    exit 1
   end
 
 private
