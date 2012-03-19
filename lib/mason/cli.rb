@@ -39,6 +39,8 @@ class Mason::CLI < Thor
     type   ||= "dir"
     output ||= "/tmp/mason.out"
 
+    output = File.expand_path(output)
+
     raise "no such output format: #{type}" unless %w( dir img tgz ).include?(type)
 
     if stack = options[:stack]
