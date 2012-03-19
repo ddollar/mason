@@ -39,6 +39,7 @@ class Mason::Buildpack
             print data
           end
         end
+        raise "compile failed" unless $?.exitstatus.zero?
       end
       compile_dir
     end
