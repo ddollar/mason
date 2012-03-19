@@ -127,7 +127,7 @@ class Mason::CLI < Thor
       puts "  = #{buildpack.name}: #{buildpack.url}"
     end
 
-    puts "  - no buildpacks installed, use buildpacks:add" if buildpacks.length.zero?
+    puts "  - no buildpacks installed, use buildpacks:install" if buildpacks.length.zero?
   end
 
   class Buildpacks < Thor
@@ -195,7 +195,7 @@ class Mason::CLI < Thor
       puts "done"
     end
 
-    desc "stacks:down STACK", "boot a stack"
+    desc "stacks:down STACK", "suspend a stack"
 
     def down(name)
       print "* stopping stack #{name}..."
