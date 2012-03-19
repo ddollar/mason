@@ -168,12 +168,12 @@ class Mason::CLI < Thor
       end
     end
 
-    desc "stacks:create name", "create a new stack"
+    desc "stacks:create VAGRANT_BOX_NAME", "create a new stack"
 
-    method_option :box, :type => :string, :aliases => "-b", :desc => "vagrant box name"
+    method_option :name, :type => :string, :aliases => "-n", :desc => "use an alternate stack name"
 
-    def create(name)
-      box = options[:box] || name
+    def create(box)
+      name = options[:name] || box
       print "* creating stack #{name}... "
       Mason::Stacks.create(name, box)
       puts "done"
