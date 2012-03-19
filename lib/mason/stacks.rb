@@ -5,16 +5,19 @@ class Mason::Stacks
 
   def self.load_vagrant!
     require "vagrant"
+    if Gem::Version.new(Vagrant::VERSION) < Gem::Version.new("1.0.1")
+      raise "mason requires vagrant 1.0.1 or higher"
+    end
     build_vagrantfile unless File.exists?(vagrantfile)
   end
 
   def self.vagrant_env(display=false)
+    load_vagrant!
     ui = display ? Vagrant::UI::Basic : nil
     Vagrant::Environment.new(:vagrantfile_name => vagrantfile, :ui_class => ui)
   end
 
   def self.vms
-    load_vagrant!
     vagrant_env.vms
   end
 
