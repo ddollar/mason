@@ -26,6 +26,8 @@ class Mason::CLI < Thor
   method_option :type,      :type => :string, :aliases => "-t", :desc => "output type (dir, img, tgz)"
 
   def build(app)
+    app = File.expand_path(app)
+
     raise "no such directory: #{app}" unless File.exists?(app)
 
     type = options[:type]
