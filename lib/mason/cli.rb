@@ -33,7 +33,9 @@ class Mason::CLI < Thor
 
     type = File.extname(output)[1..-1] if !type && output
     output = "#{app}.#{type}" if !output && type
-    type ||= "dir"
+
+    type   ||= "dir"
+    output ||= "/tmp/mason.out"
 
     raise "no such output format: #{type}" unless %w( dir img tgz ).include?(type)
 
