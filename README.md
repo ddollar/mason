@@ -51,17 +51,17 @@ Build things
 You will need [VirtualBox](https://www.virtualbox.org/wiki/Downloads) for Vagrant to function.
 
 	$ gem install vagrant
-	
+
 	$ vagrant box add cedar http://path/to/cedar.box
 
     $ mason stacks:create cedar
     * creating stack cedar... done
-    
-    $ mason stacks:up VAGRANT_BOX_NAME
+
+    $ mason stacks:up cedar
     * booting stack cedar (this may take a while)... done
-    
+
     $ mason:build /tmp/app -t tgz -o /tmp/compiled.tgz -s cedar
-    * booting stack cedar (this may take a while)... done    
+    * booting stack cedar (this may take a while)... done
 	* detecting buildpack... done
 	  = name: Baz
 	  = url: https://github.com/ddollar/buildpack-baz.git
