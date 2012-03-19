@@ -54,14 +54,14 @@ You will need [VirtualBox](https://www.virtualbox.org/wiki/Downloads) for Vagran
 
 	$ vagrant box add cedar http://path/to/cedar.box
 
-    $ mason stacks:create cedar
-    * creating stack cedar... done
+    $ mason stacks:create lucid64
+    * creating stack lucid64... done
 
-    $ mason stacks:up cedar
-    * booting stack cedar (this may take a while)... done
+    $ mason stacks:up lucid64
+    * booting stack lucid64 (this may take a while)... done
 
-    $ mason:build /tmp/app -t tgz -o /tmp/compiled.tgz -s cedar
-    * booting stack cedar (this may take a while)... done
+    $ mason:build /tmp/app -t tgz -o /tmp/compiled.tgz -s lucid64
+    * booting stack lucid64 (this may take a while)... done
 	* detecting buildpack... done
 	  = name: Baz
 	  = url: https://github.com/ddollar/buildpack-baz.git
