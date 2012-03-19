@@ -40,9 +40,8 @@ class Mason::Stacks
   def self.destroy(name)
     raise "no such stack: #{name}" unless stacks.keys.include?(name.to_sym)
     vm = vms[name.to_sym]
-    require "vagrant/errors"
-    vm.halt rescue Vagrant::Errors::VBoxManagerError
-    vm.destroy rescue Vagrant::Errors::VBoxManageError
+    vm.halt rescue nil
+    vm.destroy rescue nil
     s = stacks
     s.delete(name.to_sym)
     build_vagrantfile(s)
