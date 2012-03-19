@@ -90,7 +90,7 @@ class Mason::CLI < Thor
           system %{ tar czf "#{output}" . }
         end
       when :img then
-        puts "not yet"
+        raise "img not supported yet"
       when :dir then
         FileUtils.rm_rf output
         FileUtils.cp_r compile_dir, output
