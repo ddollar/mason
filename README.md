@@ -52,7 +52,7 @@ You will need [VirtualBox](https://www.virtualbox.org/wiki/Downloads) for Vagran
 
 	$ gem install vagrant
 
-	$ vagrant box add cedar http://path/to/cedar.box
+	$ vagrant box add lucid64 http://files.vagrantup.com/lucid64.box
 
     $ mason stacks:create lucid64
     * creating stack lucid64... done
