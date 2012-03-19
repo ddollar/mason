@@ -226,8 +226,8 @@ class Mason::CLI < Thor
     end
 
     klass.start(args)
-  # rescue StandardError => ex
-  #   raise Mason::CommandFailed, ex.message
+  rescue StandardError => ex
+    raise Mason::CommandFailed, ex.message
   end
 
 private
