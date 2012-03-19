@@ -35,6 +35,8 @@ class Mason::Buildpack
             data = io.gets
             data.gsub!(/^-----> /, "  + ")
             data.gsub!(/^       /, "      ")
+            data.gsub!(/^\s+\!\s+$/, "")
+            data.gsub!(/^\s+\!\s+/, "  ! ")
             data.gsub!(/^\s+$/, "")
             print data
           end
