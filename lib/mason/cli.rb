@@ -129,14 +129,14 @@ class Mason::CLI < Thor
     desc "buildpacks:install URL", "install a buildpack"
 
     def install(url)
-      puts "* adding buildpack #{url}"
+      puts "* installing buildpack #{url}"
       Mason::Buildpacks.install url
     end
 
     desc "buildpacks:uninstall NAME", "uninstall a buildpack"
 
     def uninstall(name)
-      puts "* removing buildpack #{name}"
+      puts "* uninstalling buildpack #{name}"
       Mason::Buildpacks.uninstall name
     end
 
