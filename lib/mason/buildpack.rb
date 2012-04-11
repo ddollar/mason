@@ -25,26 +25,26 @@ class Mason::Buildpack
   end
 
   def compile(app)
-    mkchtmpdir do |cache_dir|
-      compile_dir = Dir.mktmpdir
-      FileUtils.rm_rf compile_dir
-      FileUtils.cp_r app, compile_dir
-      Dir.chdir(compile_dir) do
-        IO.popen(%{ #{script("compile")} "#{compile_dir}" "#{cache_dir}" }) do |io|
-          until io.eof?
-            data = io.gets
-            data.gsub!(/^-----> /, "  + ")
-            data.gsub!(/^       /, "      ")
-            data.gsub!(/^\s+\!\s+$/, "")
-            data.gsub!(/^\s+\!\s+/, "  ! ")
-            data.gsub!(/^\s+$/, "")
-            print data
-          end
+    cache_dir = "#{app}/.git/cache"
+    compile_dir = Dir.mktmpdir
+    FileUtils.rm_rf compile_dir
+    FileUtils.cp_r app, compile_dir
+    FileUtils.mkdir_p cache_dir
+    Dir.chdir(compile_dir) do
+      IO.popen(%{ #{script("compile")} "#{compile_dir}" "#{cache_dir}" }) do |io|
+        until io.eof?
+          data = io.gets
+          data.gsub!(/^-----> /, "  + ")
+          data.gsub!(/^       /, "      ")
+          data.gsub!(/^\s+\!\s+$/, "")
+          data.gsub!(/^\s+\!\s+/, "  ! ")
+          data.gsub!(/^\s+$/, "")
+          print data
         end
-        raise "compile failed" unless $?.exitstatus.zero?
       end
-      compile_dir
+      raise "compile failed" unless $?.exitstatus.zero?
     end
+    compile_dir
   end
 
 private
