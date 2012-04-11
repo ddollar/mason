@@ -9,11 +9,14 @@ class Mason::Buildpacks
     FileUtils.mkdir_p root
 
     Dir.chdir(root) do
-      if URI.parse(url).path =~ /buildpack-(\w+)/
+      uri = URI.parse(url)
+      if uri.path =~ /buildpack-(\w+)/
         name = $1
+        branch = uri.fragment || master
         raise "#{name} buildpack already installed" if File.exists?(name)
-        system "git clone #{url} #{name} >/dev/null 2>&1"
+        system "git clone #{url.split('#').first} #{name} >/dev/null 2>&1"
         raise "failed to clone buildpack" unless $?.exitstatus.zero?
+        system "cd #{name} && git checkout #{branch}"
       else
         raise "BUILDPACK should be a url containing buildpack-NAME.git"
       end
