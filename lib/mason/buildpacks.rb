@@ -13,10 +13,15 @@ class Mason::Buildpacks
       if uri.path =~ /buildpack-(\w+)/
         name = $1
         branch = uri.fragment || master
-        raise "#{name} buildpack already installed" if File.exists?(name)
-        system "git clone #{url.split('#').first} #{name} >/dev/null 2>&1"
-        raise "failed to clone buildpack" unless $?.exitstatus.zero?
+        if File.exists?(name)
+          system "cd #{name} && git fetch"
+          raise "failed to update buildpack checkout" unless $?.exitstatus.zero?
+        else
+          system "git clone #{url.split('#').first} #{name} >/dev/null 2>&1"
+          raise "failed to clone buildpack" unless $?.exitstatus.zero?
+        end
         system "cd #{name} && git checkout #{branch}"
+        raise "failed to check out branch #{branch}" unless $?.exitstatus.zero?
       else
         raise "BUILDPACK should be a url containing buildpack-NAME.git"
       end
