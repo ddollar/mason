@@ -7,9 +7,10 @@ require "digest/sha1"
 class Mason::Buildpacks
 
   def self.install(url, ad_hoc=false)
-    FileUtils.mkdir_p root
+    root_dir = ad_hoc ? ad_hoc_root : root
+    FileUtils.mkdir_p root_dir
 
-    Dir.chdir(root) do
+    Dir.chdir(root_dir) do
       uri = URI.parse(url)
       if uri.path =~ /buildpack-(\w+)/
         name = $1
@@ -24,7 +25,7 @@ class Mason::Buildpacks
         end
         system "cd #{name} && git checkout #{branch}"
         raise "failed to check out branch #{branch}" unless $?.exitstatus.zero?
-        name
+        File.expand_path(root_dir + "/" + name)
       else
         raise "BUILDPACK should be a url containing buildpack-NAME.git"
       end
@@ -38,8 +39,13 @@ class Mason::Buildpacks
     end
   end
 
-  def self.root(expand=true)
+  def self.root(ad_hoc=false, expand=true)
     dir = "~/.mason/buildpacks"
+    expand ? File.expand_path(dir) : dir
+  end
+
+  def self.ad_hoc_root(expand=true)
+    dir = "~/.mason/buildpacks-ad-hoc"
     expand ? File.expand_path(dir) : dir
   end
 
@@ -54,8 +60,7 @@ class Mason::Buildpacks
   def self.detect(app)
     if url = ENV["BUILDPACK_URL"]
       puts "Using $BUILDPACK_URL: #{url}"
-      name = install(url, true)
-      buildpack_dir = File.join(root, name)
+      buildpack_dir = install(url, true)
       return Mason::Buildpack.new(buildpack_dir)
     else
       buildpacks.each do |buildpack|
