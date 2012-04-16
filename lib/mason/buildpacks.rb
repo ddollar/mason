@@ -58,8 +58,8 @@ class Mason::Buildpacks
     end
   end
 
-  def self.detect(app)
-    if url = ENV["BUILDPACK_URL"]
+  def self.detect(app, url = ENV["BUILDPACK_URL"])
+    if url
       puts "Using $BUILDPACK_URL: #{url}"
       buildpack_dir = install(url, true)
       return Mason::Buildpack.new(buildpack_dir)

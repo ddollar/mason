@@ -78,7 +78,7 @@ class Mason::CLI < Thor
     else
       print "* detecting buildpack... "
 
-      buildpack, ret = Mason::Buildpacks.detect(app)
+      buildpack, ret = Mason::Buildpacks.detect(app, options[:buildpack])
       raise "no valid buildpack detected" unless buildpack
 
       puts "done"
