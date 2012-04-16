@@ -17,7 +17,8 @@ class Mason::Buildpacks
         name += "-#{Digest::SHA1.new(url).to_s[0 .. 8]}" if ad_hoc
         branch = uri.fragment || "master"
         if File.exists?(name)
-          system "cd #{name} && git fetch"
+          # Can't do a fetch here as it won't update local branches
+          system "cd #{name} && git checkout -b master && git pull"
           raise "failed to update buildpack checkout" unless $?.exitstatus.zero?
         else
           system "git clone #{url.split('#').first} #{name} >/dev/null 2>&1"
