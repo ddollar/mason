@@ -26,6 +26,7 @@ class Mason::Buildpack
 
   def compile(app)
     cache_dir = "#{app}/.git/cache"
+    puts "  caching in #{cache_dir}"
     compile_dir = Dir.mktmpdir
     FileUtils.rm_rf compile_dir
     FileUtils.cp_r app, compile_dir
