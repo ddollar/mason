@@ -48,19 +48,36 @@ class Mason::Buildpack
       raise "compile failed" unless $?.exitstatus.zero?
     end
     release = YAML.load(`#{script('release')}`)
-    write_env(compile_dir, env_file, release)
+    write_env(compile_dir, release, env_file)
+    write_procfile(compile_dir, release)
     compile_dir
   end
 
 private
 
-  def write_env(compile_dir, env_file, release)
-    # TODO: expose this in foreman
-    env = Foreman::Engine.read_environment(env_file)
+  def write_env(compile_dir, release, env_file)
+    env = env_file ? Foreman::Engine.read_environment(env_file) : {}
     config = release["config_vars"].merge(env)
 
     File.open(File.join(compile_dir, ".env"), "w") do |f|
       f.puts config.map{|k, v| "#{k}=#{v}"}.join("\n")
+    end
+  end
+
+  def write_procfile(compile_dir, release)
+    filename = File.join(compile_dir, "Procfile")
+    process_types = release["default_process_types"] || {}
+
+    if File.exists? filename
+      Foreman::Procfile.new(filename).entries.each do |e|
+        process_types[e.name] = e.command
+      end
+    end
+
+    File.open(filename, "w") do |f|
+      process_types.each do |name, command|
+        f.puts "#{name}: #{command}"
+      end
     end
   end
 
