@@ -1,5 +1,7 @@
 require "mason"
 require "tmpdir"
+require "yaml"
+require "foreman/engine"
 
 class Mason::Buildpack
 
@@ -24,7 +26,7 @@ class Mason::Buildpack
     end
   end
 
-  def compile(app)
+  def compile(app, env_file=nil)
     cache_dir = "#{app}/.git/cache"
     puts "  caching in #{cache_dir}"
     compile_dir = Dir.mktmpdir
@@ -45,10 +47,22 @@ class Mason::Buildpack
       end
       raise "compile failed" unless $?.exitstatus.zero?
     end
+    release = YAML.load(`#{script('release')}`)
+    write_env(compile_dir, env_file, release)
     compile_dir
   end
 
 private
+
+  def write_env(compile_dir, env_file, release)
+    # TODO: expose this in foreman
+    env = Foreman::Engine.read_environment(env_file)
+    config = release["config_vars"].merge(env)
+
+    File.open(File.join(compile_dir, ".env"), "w") do |f|
+      f.puts config.map{|k, v| "#{k}=#{v}"}.join("\n")
+    end
+  end
 
   def mkchtmpdir
     ret = nil
@@ -63,6 +77,5 @@ private
   def script(name)
     File.join(dir, "bin", name)
   end
-
 end
 
