@@ -24,7 +24,7 @@ class Mason::Buildpacks
           system "git clone #{url.split('#').first} #{name} >/dev/null 2>&1"
           raise "failed to clone buildpack" unless $?.exitstatus.zero?
         end
-        system "cd #{name} && git checkout #{branch}"
+        system "cd #{name} && git checkout #{branch} 2> /dev/null"
         raise "failed to check out branch #{branch}" unless $?.exitstatus.zero?
         File.expand_path(root_dir + "/" + name)
       else

@@ -58,9 +58,11 @@ class Mason::CLI < Thor
       FileUtils.rm_rf compile_dir
       FileUtils.rm_rf mason_dir
 
-      FileUtils.cp_r File.expand_path("~/.mason/buildpacks"), buildpacks_dir
-      FileUtils.cp_r app, compile_dir
-      FileUtils.cp_r File.expand_path("../../../", __FILE__), mason_dir
+      FileUtils.cp_r(File.expand_path("~/.mason/buildpacks"), buildpacks_dir,
+                     :preserve => true)
+      FileUtils.cp_r(File.expand_path("../../../", __FILE__), mason_dir,
+                     :preserve => true)
+      FileUtils.cp_r(app, compile_dir, :preserve => true)
 
       mason_args =  %{ /share/app -q -o /share/output -t #{type} }
       mason_args += %{ -b "#{options[:buildpack]}" } if options[:buildpack]
@@ -71,7 +73,8 @@ class Mason::CLI < Thor
       COMMAND
 
       FileUrils.rm_rf output
-      FileUtils.cp_r File.expand_path("~/.mason/share/#{stack}/output"), output
+      FileUtils.cp_r(File.expand_path("~/.mason/share/#{stack}/output"), output,
+                     :preserve => true)
 
       puts "* packaging"
       puts "  = type: #{type}"
@@ -100,7 +103,7 @@ class Mason::CLI < Thor
         raise "img not supported yet"
       when :dir then
         FileUtils.rm_rf output
-        FileUtils.cp_r compile_dir, output
+        FileUtils.cp_r compile_dir, output, :preserve => true
       else
         raise "no such output type: #{type}"
       end

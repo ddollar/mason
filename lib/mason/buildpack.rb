@@ -31,7 +31,7 @@ class Mason::Buildpack
     puts "  caching in #{cache_dir}"
     compile_dir = Dir.mktmpdir
     FileUtils.rm_rf compile_dir
-    FileUtils.cp_r app, compile_dir
+    FileUtils.cp_r app, compile_dir, :preserve => true
     FileUtils.mkdir_p cache_dir
     Dir.chdir(compile_dir) do
       IO.popen(%{ #{script("compile")} "#{compile_dir}" "#{cache_dir}" }) do |io|
