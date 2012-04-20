@@ -14,7 +14,7 @@ class Mason::Buildpacks
       uri = URI.parse(url)
       if uri.path =~ /buildpack-(\w+)/
         name = $1
-        name += "-#{Digest::SHA1.new(url).to_s[0 .. 8]}" if ad_hoc
+        name += "-#{Digest::SHA1.hexdigest(url).to_s[0 .. 8]}" if ad_hoc
         branch = uri.fragment || "master"
         if File.exists?(name)
           # Can't do a fetch here as it won't update local branches
