@@ -18,7 +18,7 @@ class Mason::Buildpacks
         branch = uri.fragment || "master"
         if File.exists?(name)
           # Can't do a fetch here as it won't update local branches
-          system "cd #{name} && git checkout -b master && git pull"
+          system "cd #{name} && git checkout master && git pull"
           raise "failed to update buildpack checkout" unless $?.exitstatus.zero?
         else
           system "git clone #{url.split('#').first} #{name} >/dev/null 2>&1"
@@ -58,10 +58,10 @@ class Mason::Buildpacks
     end
   end
 
-  def self.detect(app, url = ENV["BUILDPACK_URL"])
-    if url
-      puts "Using $BUILDPACK_URL: #{url}"
-      buildpack_dir = install(url, true)
+  def self.detect(app, buildpack_url)
+    if buildpack_url
+      puts "Using $BUILDPACK_URL: #{buildpack_url}"
+      buildpack_dir = install(buildpack_url, true)
       return Mason::Buildpack.new(buildpack_dir)
     else
       buildpacks.each do |buildpack|
