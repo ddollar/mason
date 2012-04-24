@@ -26,8 +26,8 @@ class Mason::Buildpack
     end
   end
 
-  def compile(app, env_file=nil)
-    cache_dir = "#{app}/.git/cache"
+  def compile(app, env_file=nil, cache=nil)
+    cache_dir = cache || "#{app}/.git/cache"
     puts "  caching in #{cache_dir}"
     compile_dir = Dir.mktmpdir
     FileUtils.rm_rf compile_dir

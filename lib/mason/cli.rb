@@ -26,6 +26,7 @@ class Mason::CLI < Thor
   method_option :stack,     :type => :string, :aliases => "-s", :desc => "use a stack for building"
   method_option :type,      :type => :string, :aliases => "-t", :desc => "output type (dir, img, tgz)"
   method_option :env_file,  :type => :string, :aliases => "-e", :desc => "config environment file"
+  method_option :cache,     :type => :string, :aliases => "-c", :desc => "cache directory"
 
   def build(app)
     app = File.expand_path(app)
@@ -92,7 +93,7 @@ class Mason::CLI < Thor
       puts "  = display: #{ret}"
 
       puts "* compiling..."
-      compile_dir = buildpack.compile(app, options[:env_file])
+      compile_dir = buildpack.compile(app, options[:env_file], options[:cache])
 
       print "* packaging... " unless options[:quiet]
       case type.to_sym
