@@ -25,6 +25,8 @@ class Mason::CLI < Thor
   method_option :quiet,     :type => :boolean, :aliases => "-q", :desc => "quiet packaging output"
   method_option :stack,     :type => :string, :aliases => "-s", :desc => "use a stack for building"
   method_option :type,      :type => :string, :aliases => "-t", :desc => "output type (dir, img, tgz)"
+  method_option :env_file,  :type => :string, :aliases => "-e", :desc => "config environment file"
+  method_option :cache,     :type => :string, :aliases => "-c", :desc => "cache directory"
 
   def build(app)
     app = File.expand_path(app)
@@ -57,9 +59,11 @@ class Mason::CLI < Thor
       FileUtils.rm_rf compile_dir
       FileUtils.rm_rf mason_dir
 
-      FileUtils.cp_r File.expand_path("~/.mason/buildpacks"), buildpacks_dir
-      FileUtils.cp_r app, compile_dir
-      FileUtils.cp_r File.expand_path("../../../", __FILE__), mason_dir
+      FileUtils.cp_r(File.expand_path("~/.mason/buildpacks"), buildpacks_dir,
+                     :preserve => true)
+      FileUtils.cp_r(File.expand_path("../../../", __FILE__), mason_dir,
+                     :preserve => true)
+      FileUtils.cp_r(app, compile_dir, :preserve => true)
 
       mason_args =  %{ /share/app -q -o /share/output -t #{type} }
       mason_args += %{ -b "#{options[:buildpack]}" } if options[:buildpack]
@@ -70,7 +74,8 @@ class Mason::CLI < Thor
       COMMAND
 
       FileUrils.rm_rf output
-      FileUtils.cp_r File.expand_path("~/.mason/share/#{stack}/output"), output
+      FileUtils.cp_r(File.expand_path("~/.mason/share/#{stack}/output"), output,
+                     :preserve => true)
 
       puts "* packaging"
       puts "  = type: #{type}"
@@ -78,7 +83,8 @@ class Mason::CLI < Thor
     else
       print "* detecting buildpack... "
 
-      buildpack, ret = Mason::Buildpacks.detect(app)
+      buildpack_url = ENV["BUILDPACK_URL"] || options[:buildpack]
+      buildpack, ret = Mason::Buildpacks.detect(app, buildpack_url)
       raise "no valid buildpack detected" unless buildpack
 
       puts "done"
@@ -87,7 +93,7 @@ class Mason::CLI < Thor
       puts "  = display: #{ret}"
 
       puts "* compiling..."
-      compile_dir = buildpack.compile(app)
+      compile_dir = buildpack.compile(app, options[:env_file], options[:cache])
 
       print "* packaging... " unless options[:quiet]
       case type.to_sym
@@ -99,7 +105,7 @@ class Mason::CLI < Thor
         raise "img not supported yet"
       when :dir then
         FileUtils.rm_rf output
-        FileUtils.cp_r compile_dir, output
+        FileUtils.cp_r compile_dir, output, :preserve => true
       else
         raise "no such output type: #{type}"
       end
