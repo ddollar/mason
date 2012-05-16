@@ -47,7 +47,7 @@ class Mason::Buildpack
       end
       raise "compile failed" unless $?.exitstatus.zero?
     end
-    release = YAML.load(`#{script('release')} "#{build_dir}"`)
+    release = YAML.load(`#{script('release')} "#{compile_dir}"`)
     write_env(compile_dir, release, env_file)
     write_procfile(compile_dir, release)
     compile_dir
