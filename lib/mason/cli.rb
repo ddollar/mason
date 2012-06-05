@@ -47,9 +47,13 @@ class Mason::CLI < Thor
     raise "no such output format: #{type}" unless %w( dir img tgz ).include?(type)
 
     if stack = options[:stack]
-      print "* booting stack #{stack} (this may take a while)... "
-      Mason::Stacks.up(stack)
-      puts "done"
+      if Mason::Stacks.state(stack) == :up
+        puts "* using stack #{stack}"
+      else
+        print "* booting stack #{stack} (this may take a while)... "
+        Mason::Stacks.up(stack)
+        puts "done"
+      end
 
       buildpacks_dir = File.expand_path("~/.mason/share/#{stack}/buildpacks")
       compile_dir = File.expand_path("~/.mason/share/#{stack}/app")
