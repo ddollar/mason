@@ -77,7 +77,7 @@ class Mason::CLI < Thor
         /usr/bin/env ruby -rubygems /share/mason/bin/mason build #{mason_args}
       COMMAND
 
-      FileUrils.rm_rf output
+      FileUtils.rm_rf output
       FileUtils.cp_r(File.expand_path("~/.mason/share/#{stack}/output"), output,
                      :preserve => true)
 
