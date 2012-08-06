@@ -57,7 +57,8 @@ private
 
   def write_env(compile_dir, release, env_file)
     env = env_file ? Foreman::Engine.new.load_env(env_file) : {}
-    config = release["config_vars"].merge(env)
+    config_vars  = release["config_vars"] || {}
+    config = config_vars.merge(env)
 
     File.open(File.join(compile_dir, ".env"), "w") do |f|
       f.puts config.map{|k, v| "#{k}=#{v}"}.join("\n")
