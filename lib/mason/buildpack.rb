@@ -70,8 +70,8 @@ private
     process_types = release["default_process_types"] || {}
 
     if File.exists? filename
-      Foreman::Procfile.new(filename).entries.each do |e|
-        process_types[e.name] = e.command
+      Foreman::Procfile.new(filename).entries do |name, command|
+        process_types[name] = command
       end
     end
 
