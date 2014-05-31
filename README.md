@@ -1,3 +1,7 @@
+# DEPRECATED
+
+This project is deprecated and is no longer supported.
+
 # Mason
 
 Build things
